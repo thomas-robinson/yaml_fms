@@ -1,0 +1,19 @@
+---
+basedate: 1979
+diag_files:
+     name: "atmos_daily"
+     freq: 24
+     frequnit: hours
+     timeunit: days
+     unlimdim: time
+
+diag_fields: 
+     name: tdata
+     var:  tdata
+     files: [atmos_daily]
+     all: all
+     reduction: [False]
+     region: [none]
+     kind: double
+     module: "moist"
+     realm: atm
