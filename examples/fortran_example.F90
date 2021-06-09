@@ -1,6 +1,26 @@
-!> \author Tom Robinson
-!!
-!> \description This is a test program that will parse values from a YAML file.
+!***********************************************************************
+!*                   GNU Lesser General Public License
+!*
+!* This file is part of the GFDL Flexible Modeling System (FMS).
+!*
+!* FMS is free software: you can redistribute it and/or modify it under
+!* the terms of the GNU Lesser General Public License as published by
+!* the Free Software Foundation, either version 3 of the License, or (at
+!* your option) any later version.
+!*
+!* FMS is distributed in the hope that it will be useful, but WITHOUT
+!* ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+!* FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+!* for more details.
+!*
+!* You should have received a copy of the GNU Lesser General Public
+!* License along with FMS.  If not, see <http://www.gnu.org/licenses/>.
+!***********************************************************************
+
+!> @file
+!! @brief Tests for YAML parsing 
+!! @author Tom Robinson
+!! @email gfdl.climate.model.info@noaa.gov
 program fortran_example
 
 use fms_yaml_parser_mod,        only:fms_yaml_read, fms_yaml_key_value
