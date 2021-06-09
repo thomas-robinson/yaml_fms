@@ -7,10 +7,51 @@
 #include <assert.h>
 
 #include <libfyaml.h>
-
-int fms_yaml_parse_int (struct fy_document *fyd, char *variable) {
+/** \brief Parses yamlString to get the integer value of variable.
+ * `variable` should have give the hierarchical structure of the key requested
+ * in the form "/top/sub/level/key %d" with the %d to denote an integer.
+ **/
+int fms_yaml_parse_int (char *yamlString, int yamlLen, char *variable) {
+   struct fy_document *fyd;
    int count;
    int ivar;
+/* Read the YAML */
+   fyd = fy_document_build_from_string (NULL, yamlString, yamlLen); 
+/* Get the integer from the YAML */
    count =  fy_document_scanf(fyd, variable, &ivar);
-   return &ivar;
+/* Return the integer */
+   return ivar;
 }
+/** \brief Parses yamlString to get the float value of variable.
+ *  * `variable` should have give the hierarchical structure of the key requested
+ *   * in the form "/top/sub/level/key %f" with the %f to denote a float.
+ *    **/
+float fms_yaml_parse_float (char *yamlString, int yamlLen, char *variable) {
+   struct fy_document *fyd;
+   int count;
+   float fvar;
+/* Read the YAML */
+   fyd = fy_document_build_from_string (NULL, yamlString, yamlLen);
+/* Get the integer from the YAML */
+   count =  fy_document_scanf(fyd, variable, &fvar);
+/* Return the integer */
+   return fvar;
+}
+
+/** \brief Parses yamlString to get the string value of variable.
+ *  *  * `variable` should have give the hierarchical structure of the key requested
+ *   *   * in the form "/top/sub/level/key %s" with the %s to denote a string.
+ *    *    **/
+char * fms_yaml_parse_string (char *yamlString, int yamlLen, char *variable) {
+   struct fy_document *fyd;
+   int count;
+   char *fvar;
+/* Read the YAML */
+   fyd = fy_document_build_from_string (NULL, yamlString, yamlLen);
+/* Get the integer from the YAML */
+   count =  fy_document_scanf(fyd, variable, fvar);
+/* Return the integer */
+   return fvar;
+}
+
+
