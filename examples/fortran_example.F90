@@ -1,3 +1,6 @@
+!> \author Tom Robinson
+!!
+!> \description This is a test program that will parse values from a YAML file.
 program fortran_example
 
 use fms_yaml_parser_mod,        only:fms_yaml_read, fms_yaml_key_value
@@ -12,7 +15,9 @@ integer :: placeOld
 integer :: placeNew
 type (c_ptr) :: cptr
 integer :: frequency
+integer, parameter :: referenceFrequency = 24
 
+!> Read in the YAML file.
 placeOld = 1
 open (29, file="simple.yaml", status="old")
 
@@ -28,8 +33,17 @@ do i = 1,numlines
  lineBuffer="                         "
 enddo
 
+!> Parse the YAML
 cptr = fms_yaml_read (yamlString)
-
+!> Read an integer value from the YAML
  call fms_yaml_key_value (yamlString, "diag_files/freq %d", frequency)
- write (6,*) "The frequency should be 24.  It is ", frequency
+ !> Check the value
+ if (frequency .ne. referenceFrequency) then
+   write (6,550) "The frequency ",frequency," did not match the reference value ", referenceFrequency
+ else
+    write (6,550) "The frequency is ", frequency, " matching the reference value ",referenceFrequency
+ endif
+
+550 format (a,i2,a,i2)
+
 end program fortran_example
