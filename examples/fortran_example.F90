@@ -35,7 +35,10 @@ integer :: placeOld
 integer :: placeNew
 type (c_ptr) :: cptr
 integer :: frequency
+character (len=20) :: fname_stack
+character (len=:), allocatable :: fname_heap
 integer, parameter :: referenceFrequency = 24
+character(len=11) :: referenceFilename = "atmos_daily"
 
 !> Read in the YAML file.
 placeOld = 1
@@ -56,13 +59,31 @@ enddo
 !> Parse the YAML
 cptr = fms_yaml_read (yamlString)
 !> Read an integer value from the YAML
- call fms_yaml_key_value (yamlString, "diag_files/freq %d", frequency)
+ call fms_yaml_key_value (yamlString, "/diag_files/freq %d", frequency)
  !> Check the value
  if (frequency .ne. referenceFrequency) then
-   write (6,550) "The frequency ",frequency," did not match the reference value ", referenceFrequency
+   write (6,550) "The frequency ",frequency, " did not match the reference value ", referenceFrequency
  else
     write (6,550) "The frequency is ", frequency, " matching the reference value ",referenceFrequency
  endif
+
+!> Read a string value into the stack
+ call fms_yaml_key_value (yamlString, "/diag_files/name %256s", fname_stack)
+ if (trim(fname_stack) .ne. trim(referenceFilename)) then
+    write(6,*) trim(fname_stack)," does not match ", trim(referenceFilename)
+ else
+    write(6,*) trim(fname_stack)," matches ",trim(referenceFilename)
+ endif
+
+!> Read a string value into the heap
+ allocate(character(len=20) :: fname_heap)
+ call fms_yaml_key_value (yamlString, "diag_files/name %s", fname_heap)
+ if (trim(fname_heap) .ne. trim(referenceFilename)) then
+   write (6,*) "The trim(fname_heap) ",trim(fname_heap)," did not match the reference value ", trim(referenceFilename)
+ else
+    write (6,*) "The trim(fname_heap) is ", trim(fname_heap), " matching the reference value ",trim(referenceFilename)
+ endif
+
 
 550 format (a,i2,a,i2)
 

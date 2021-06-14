@@ -23,11 +23,12 @@
 !! @author Tom Robinson
 !! @email gfdl.climate.model.info@noaa.gov
 module fms_yaml_parser_mod
+use c_to_fortran_mod,  only:fms_c2f_string
 use iso_c_binding
 implicit none
 
 
-public :: fms_yaml_read, fms_yaml_key_value, 
+public :: fms_yaml_read, fms_yaml_key_value
 
 
 interface 
@@ -48,7 +49,17 @@ real(c_float) function fms_yaml_parse_real (yaml, len_yaml, variable) &
  character (kind=c_char), intent(in) :: variable
 end function fms_yaml_parse_real
 
-end interface 
+function fms_yaml_parse_string (yaml, len_yaml, variable) &
+                                    result (c_string)     &
+                                    bind (C, name="fms_yaml_parse_string")
+ use iso_c_binding
+ character (kind=c_char) :: yaml
+ integer (C_int), value :: len_yaml
+ character (kind=c_char), intent(in) :: variable
+ character (kind=c_char) :: c_string
+end function fms_yaml_parse_string
+
+end interface
 
 interface
 
@@ -64,7 +75,7 @@ end interface
 
 contains
 
-!> \brief Subrotuine to read the 
+!> \brief Subrotuine to read the input yaml file and return a c pointer to it
 function fms_yaml_read (input_yaml, user_defined_parser) result(yaml_c_pointer)
  character (len=*), intent(in) :: input_yaml !< String holding the YAML to be parsed
  type (c_ptr), intent(in), optional :: user_defined_parser !< A parser that has been defined by the user
@@ -107,16 +118,46 @@ subroutine fms_yaml_key_value (input_yaml, variableINyaml, variableValue)
                                                   !! hierarchical structure of the key
  class(*), target, intent (IN)  :: variableValue  !< The value of the key
  class(*), pointer              :: var => NULL()  !< Pointer to the variable value
- 
+ character (kind=c_char) :: c_string
+! character (len=*), pointer :: f_string
  var => variableValue
  select type (var)
         type is (integer)
                 var = fms_yaml_parse_int (input_yaml,len_trim(input_yaml),variableINyaml)
         type is (real(kind=4))
                 var = fms_yaml_parse_real (input_yaml,len_trim(input_yaml),variableINyaml)
+        type is (character(*))
+                c_string = fms_yaml_parse_string (input_yaml,len_trim(input_yaml),variableINyaml)
+                call string_parse (c_string, var)
         class default
                 write (6,*) "The type you seek is not yet supported"
  end select
-end subroutine fms_yaml_key_value 
+end subroutine fms_yaml_key_value
+
+!> \brief A routine to convert a C string to a fortran string
+subroutine string_parse (c_string_in, fortran_string_out)
+ character (kind=c_char), intent(in) :: c_string_in !< Input C string
+ character(*), intent(out) :: fortran_string_out !< Output fortran string
+ character(len=:), allocatable :: fstring !< Temporaty fortran string pointer
+ integer :: len_of_string !< Length of the fortran string
+ !> Convert the c_string to fortran using the fms_c2f_string routine
+ fstring = fms_c2f_string (c_string_in)
+ !> Get the length of the string
+ len_of_string = len_trim(fstring)
+ !> Make sure that the output string is big enough
+ if (len(fortran_string_out) .lt. len_of_string) write (6,*) &
+     & "The length of the string for this variable need to be increased."
+ !> Put the string into the output
+    fortran_string_out(1:len_of_string) = fstring(1:len_of_string)
+ !> Deallocate the temporary memory
+ write (6,*) c_string_in
+ write (6,*) fstring
+ write (6,*) fstring (1:len_of_string)
+ if (allocated(fstring)) deallocate(fstring)
+   
+end subroutine string_parse
+
 
 end module fms_yaml_parser_mod
+
+
