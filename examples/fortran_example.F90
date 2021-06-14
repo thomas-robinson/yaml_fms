@@ -76,13 +76,13 @@ cptr = fms_yaml_read (yamlString)
  endif
 
 !> Read a string value into the heap
- allocate(character(len=20) :: fname_heap)
- call fms_yaml_key_value (yamlString, "diag_files/name %s", fname_heap)
- if (trim(fname_heap) .ne. trim(referenceFilename)) then
-   write (6,*) "The trim(fname_heap) ",trim(fname_heap)," did not match the reference value ", trim(referenceFilename)
- else
-    write (6,*) "The trim(fname_heap) is ", trim(fname_heap), " matching the reference value ",trim(referenceFilename)
- endif
+!allocate(character(len=20) :: fname_heap)
+!call fms_yaml_key_value (yamlString, "diag_files/name %s", fname_heap)
+!if (trim(fname_heap) .ne. trim(referenceFilename)) then
+!  write (6,*) "The trim(fname_heap) ",trim(fname_heap)," did not match the reference value ", trim(referenceFilename)
+!else
+!   write (6,*) "The trim(fname_heap) is ", trim(fname_heap), " matching the reference value ",trim(referenceFilename)
+!endif
 
 
 550 format (a,i2,a,i2)

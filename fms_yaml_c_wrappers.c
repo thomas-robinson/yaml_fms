@@ -71,16 +71,19 @@ float fms_yaml_parse_float (char *yamlString, int yamlLen, char *variable) {
  * `variable` should have give the hierarchical structure of the key requested
  * in the form "/top/sub/level/key %s" with the %s to denote a string.
  **/
-char * fms_yaml_parse_string (char *yamlString, int yamlLen, char *variable) {
+const char * fms_yaml_parse_string (char *yamlString, int yamlLen, char *variable) {
    struct fy_document *fyd;
    int count;
-   char *fvar;
+   const char *cvar;
+   char var[256 + 1]; 
 /* Read the YAML */
    fyd = fy_document_build_from_string (NULL, yamlString, yamlLen);
 /* Get the integer from the YAML */
-   count =  fy_document_scanf(fyd, variable, fvar);
-/* Return the integer */
-   return fvar;
+   count =  fy_document_scanf(fyd, variable, var);
+/* Return the string */
+   strcpy(cvar,var);
+ printf("%d %s \n",count,cvar);
+   return cvar;
 }
 
 
