@@ -23,12 +23,12 @@
 !! @author Tom Robinson
 !! @email gfdl.climate.model.info@noaa.gov
 module fms_yaml_parser_mod
-use c_to_fortran_mod,  only:fms_c2f_string
+use c_to_fortran_mod,  only:fms_c2f_string, c_strlen
 use iso_c_binding
 implicit none
 
 
-public :: fms_yaml_read, fms_yaml_key_value
+public :: fms_yaml_read, fms_yaml_key_value, fms_yaml_get_string_length
 
 
 interface 
@@ -56,7 +56,7 @@ function fms_yaml_parse_string (yaml, len_yaml, variable) &
  character (kind=c_char) :: yaml
  integer (C_int), value :: len_yaml
  character (kind=c_char), intent(in) :: variable
- character (kind=c_char) :: c_string
+ type (c_ptr) :: c_string
 end function fms_yaml_parse_string
 
 end interface
@@ -118,7 +118,8 @@ subroutine fms_yaml_key_value (input_yaml, variableINyaml, variableValue)
                                                   !! hierarchical structure of the key
  class(*), target, intent (IN)  :: variableValue  !< The value of the key
  class(*), pointer              :: var => NULL()  !< Pointer to the variable value
- character (kind=c_char) :: c_string
+! character (kind=c_char) :: c_string
+ type (c_ptr) :: c_string
 ! character (len=*), pointer :: f_string
  var => variableValue
  select type (var)
@@ -136,7 +137,8 @@ end subroutine fms_yaml_key_value
 
 !> \brief A routine to convert a C string to a fortran string
 subroutine string_parse (c_string_in, fortran_string_out)
- character (kind=c_char), intent(in) :: c_string_in !< Input C string
+! character (kind=c_char), intent(in) :: c_string_in !< Input C string
+ type (c_ptr), intent (in) :: c_string_in !< Input C string
  character(*), intent(out) :: fortran_string_out !< Output fortran string
  character(len=:), allocatable :: fstring !< Temporaty fortran string pointer
  integer :: len_of_string !< Length of the fortran string
@@ -150,14 +152,26 @@ subroutine string_parse (c_string_in, fortran_string_out)
  !> Put the string into the output
     fortran_string_out(1:len_of_string) = fstring(1:len_of_string)
  !> Deallocate the temporary memory
- write (6,*) c_string_in
+! write (6,*) c_string_in
  write (6,*) fstring
  write (6,*) fstring (1:len_of_string)
  if (allocated(fstring)) deallocate(fstring)
    
 end subroutine string_parse
 
+integer function fms_yaml_get_string_length (input_yaml, variableINyaml)
+ character (len=*), intent (IN) :: input_yaml     !< String containing the YAML
+ character (len=*), intent (IN) :: variableINyaml !< The string formatted with the
+                                                  !! hierarchical structure of
+                                                  !the key
+ type (c_ptr) :: c_string
+
+ c_string = fms_yaml_parse_string (input_yaml,len_trim(input_yaml),variableINyaml)
+
+! c_integer = c_strlen(c_string)
+! fms_yaml_get_string_length = c_integer
+  fms_yaml_get_string_length = c_strlen(c_string)
+end function fms_yaml_get_string_length
+
 
 end module fms_yaml_parser_mod
-
-

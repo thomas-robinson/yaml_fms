@@ -12,8 +12,8 @@ diag_fields:
      var:  tdata
      files: [atmos_daily]
      all: all
-     reduction: [False]
-     region: [none]
+     reduction: [False, True]
+     region: [none, some]
      kind: double
      module: "moist"
      realm: atm

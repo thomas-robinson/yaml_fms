@@ -9,18 +9,18 @@ CPPDEFS=-I$(LIBFYAML)/include -L$(LIBFYAML)/lib -lfyaml-0.7
 FFLAGS= $(FFLAGS_INTEL)
 CFLAGS=$(CFLAGS_INTEL)
 
-fortran_example: fms_yaml_parser
+fortran_example: fms_libfyaml_parser
 	export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:$(LIBFYAML)/lib
 	export LIBRARY_PATH=${LIBRARY_PATH}:$(LIBFYAML)/lib
-	$(FC) $(CPPDEFS) $(FFLAGS) $^.o fms_yaml_c_wrappers.o fms_c_to_fortran.o $@.F90 -o $@.x
+	$(FC) $(CPPDEFS) $(FFLAGS) $^.o fms_libfyaml_c_wrappers.o fms_c_to_fortran.o $@.F90 -o $@.x
 	./$@.x 
 	make clean
 
-fms_yaml_parser: fms_yaml_c_wrappers fms_c_to_fortran
+fms_libfyaml_parser: fms_libfyaml_c_wrappers fms_c_to_fortran
 	export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:$(LIBFYAML)/lib
 	export LIBRARY_PATH=${LIBRARY_PATH}:$(LIBFYAML)/lib
 	$(FC) $(CPPDEFS) $(FFLAGS) ../$@.F90 -c
-fms_yaml_c_wrappers:
+fms_libfyaml_c_wrappers:
 	export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:$(LIBFYAML)/lib
 	export LIBRARY_PATH=${LIBRARY_PATH}:$(LIBFYAML)/lib
 	$(CC) $(CPPDEFS) $(CFLAGS) ../$@.c -c
